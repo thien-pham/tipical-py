@@ -9,19 +9,15 @@ class Tip(Base):
     title = Column(String(128))
     body = Column(String(1024))
     datetime = Column(DateTime, default=datetime.datetime.now)
-    # votes = Column(Integer)
+    # TODO: add in location
 
     def as_dictionary(self):
         tip = {
             "id": self.id,
             "title": self.title,
             "body": self.body
-            # "timestamp": self.timestamp
         }
         return tip
-  #   date: {type: Date, default: Date.now()},
-  # location:{ type: [Number], index: '2dsphere',},
-  # tags: Array,
-  # points: {type: Array, default: []}
+
 
 Base.metadata.create_all(engine)
