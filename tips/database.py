@@ -2,9 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from posts import app
+from tips import app
 
-engine = create_engine(app.config["DATABASE_URI"])
+engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 session = Session()
