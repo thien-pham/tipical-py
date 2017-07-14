@@ -1,22 +1,23 @@
 import json
-
-from flask import request, Response, url_for
+from flask import request, Response, url_for, flash
 from jsonschema import validate, ValidationError
+from flask_login import login_user, login_required, current_user, logout_user
 
 # from . import models
 from . import decorators
 from tips import app
-from .database import session, Tip
+from .database import session, Tip, User
 
 # JSON Schema describing the structure of a tip
 tip_schema = {
     "properties": {
         "title" : {"type" : "string"},
         "body": {"type": "string"}
+        # "location": {"type": "geography"}
     },
     "required": ["title", "body"]
 }
-#TODO: make separate views.py file and do endpoints for rendering templates
+
 @app.route("/api/tips", methods=["GET"])
 @decorators.accept("application/json")
 def tips_get():
@@ -50,20 +51,21 @@ def tip_get(id):
 @app.route("/api/tips", methods=["POST"])
 @decorators.accept("application/json")
 @decorators.require("application/json")
+@login_required
 def post_tip():
     """ Add a new tip """
     data = request.json
 
     # Check that the JSON supplied is valid
     # If not you return a 422 Unprocessable Entity TODO: get rid of validation
-    try:
-        validate(data, tip_schema)
-    except ValidationError as error:
-        data = {"message": error.message}
-        return Response(json.dumps(data), 422, mimetype="application/json")
+    # try:
+    #     validate(data, tip_schema)
+    # except ValidationError as error:
+    #     data = {"message": error.message}
+    #     return Response(json.dumps(data), 422, mimetype="application/json")
 
     # Add the tip to the database
-    tip = Tip(title=data["title"], body=data["body"])
+    tip = Tip(title=data["title"], body=data["body"], author=current_user)
     session.add(tip)
     session.commit()
 
@@ -79,20 +81,22 @@ def post_tip():
 @app.route("/api/tips/<int:id>", methods=["PUT"])
 @decorators.accept("application/json")
 @decorators.require("application/json")
+@login_required
 def update_tip(id):
     """update a single tip"""
 
     tip = session.query(Tip).get(id)
     data = request.json
-    try:
-        validate(data, tip_schema)
-    except ValidationError as error:
-        data = {"messae": error.message}
-        return Response(json.dumps(data), 422, mimetype="application/json")
+    # try:
+    #     validate(data, tip_schema)
+    # except ValidationError as error:
+    #     data = {"messae": error.message}
+    #     return Response(json.dumps(data), 422, mimetype="application/json")
 
 # TODO: Allow partial (single-field) updates
     tip.title = data["title"]
     tip.body = data["body"]
+    # tip.location = data["location"]
     session.commit()
 
     data = json.dumps(tip.as_dictionary())

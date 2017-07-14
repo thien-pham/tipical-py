@@ -4,6 +4,8 @@
         <ul class="list-unstyled">
             <li>
                 {{ tip.datetime | dateformat("%d/%m/%y") }}
+                <br>
+                {{ tip.author.name }}
             </li>
         </ul>
     </div>
@@ -12,6 +14,7 @@
             <a href="/api/tips/{{tip.id}}">{{ tip.title }}</a>
         </h1>
         {{ tip.body | markdown }}
+        <!-- {{ tip.location }} -->
         <div>
           <a href="/api/tips/{{ tip.id }}/edit">Edit</a>
           <a href="/api/tips/{{ tip.id }}/delete">Delete</a>

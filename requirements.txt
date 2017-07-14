@@ -9,3 +9,6 @@ nose
 psycopg2
 flask-script
 mistune
+GeoAlchemy2
+flask_login
+flask_migrate
